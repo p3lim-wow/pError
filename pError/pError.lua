@@ -31,12 +31,13 @@ local blacklist = {
 	ERR_NOEMOTEWHILERUNNING,        -- You can't do that while moving!
 }
 
-local lastEvent
-local oldUIErrorsFrame_OnEvent = UIErrorsFrame_OnEvent
+local last
+local orig = UIErrorsFrame_OnEvent
 function UIErrorsFrame_OnEvent(event, msg, ...)
-	for _,text in pairs(blacklist) do
+	last = msg
+	for i,text in pairs(blacklist) do
 		if(text and msg and msg == text) then return end
 	end
-	if(msg and msg == lastEvent) then return end
-	return oldUIErrorsFrame_OnEvent(event, msg, ...)
+	if(msg and msg == last) then return end
+	return orig(event, msg, ...)
 end
