@@ -1,8 +1,10 @@
 --[[
-	You can find more errors to add to the blacklist below at this list:
-	http://www.wowwiki.com/WoW_Constants/Errors
-	
-	Just use CTRL+F to find the right constant
+	Below you will find a table of errors.
+	You add your custom one(s) just like shown below.
+	Dont replace any, just add it.
+
+	You can find more error constants by following the
+	link found on the info page on WoWInterface.com.
 --]]
 
 local blacklist = {
@@ -46,7 +48,6 @@ local blacklist = {
 
 local OrigHandler = UIErrorsFrame_OnEvent
 function UIErrorsFrame_OnEvent(self, event, msg, ...)
-	local db = _G.pErrorDB or {}
 	if(event == 'UI_ERROR_MESSAGE') then
 		for _, i in ipairs(blacklist) do
 			if(msg == i) then return end
