@@ -51,7 +51,7 @@ SlashCmdList.PERROR = function(str)
 		for k,v in pairs(pErrorDB) do
 			if(k == str) then
 				pErrorDB[k] = not v
-				print(format('|cffff8080pError:|r %s "%s"', k, v and 'Enabled' or 'Disabled'))
+				print(format('|cffff8080pError:|r %s "%s"', v and '|cffff0000Disabled|r' or '|cff00ff00Enabled|r', k))
 				return
 			end
 		end
