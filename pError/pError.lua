@@ -1,58 +1,64 @@
---[[
-	Below you will find a table of errors.
-	You add your custom one(s) just like shown below.
-	Dont replace any, just add it.
+local addon = CreateFrame('Frame')
+local orig = UIErrorsFrame_OnEvent
 
-	You can find more error constants by following the
-	link found on the info page on WoWInterface.com.
---]]
-
-local blacklist = {
-	INTERRUPTED, -- Interrupted
-	ERR_NO_ATTACK_TARGET, -- There is nothing to attack.
-	SPELL_FAILED_NO_COMBO_POINTS, -- That ability requires combo points
-	ERR_INVALID_ATTACK_TARGET, -- You cannot attack that target.
-	ERR_OUT_OF_RANGE, -- Out of range.
-	ERR_BADATTACKPOS, -- You are too far away!
-	SPELL_FAILED_NOT_BEHIND, -- You must be behind your target.
-	ERR_ABILITY_COOLDOWN, -- Ability is not ready yet.
-	ERR_GENERIC_NO_TARGET, -- You have no target.
-	SPELL_FAILED_UNIT_NOT_INFRONT, -- Target needs to be in front of you
-	SPELL_FAILED_MOVING , -- Can't do that while moving
-	ERR_OUT_OF_RAGE, -- Not enough rage
-	ERR_BADATTACKFACING, -- You are facing the wrong way
-	ERR_OUT_OF_ENERGY, -- Not enough energy
-	ERR_OUT_OF_MANA, -- Not enough mana
-	SPELL_FAILED_TOO_CLOSE, -- Target too close
-	SPELL_FAILED_TARGETS_DEAD, -- Your target is dead
-	SPELL_FAILED_STUNNED, -- Can't do that while stunned
-	ERR_SPELL_COOLDOWN, -- Spell is not ready yet.
-	SPELL_FAILED_CASTER_DEAD, -- You are dead
-	SPELL_FAILED_ONLY_STEALTHED, -- You must be in stealth mode.
-	ERR_ATTACK_FLEEING, -- Can't attack while fleeing.
-	ERR_ATTACK_STUNNED, -- Can't attack while stunned.
-	SPELL_FAILED_NOT_IN_CONTROL, -- You are not in control of your actions
-	ERR_ITEM_COOLDOWN, -- Item is not ready yet.
-	ERR_ATTACK_CONFUSED, -- Can't attack while confused.
-	SPELL_FAILED_LINE_OF_SIGHT, -- Target not in line of sight
-	SPELL_FAILED_SPELL_IN_PROGRESS, -- Another action is in progress
-	SPELL_FAILED_NOT_SHAPESHIFT, -- You are in shapeshift form
-	ERR_USE_TOO_FAR, -- You are too far away.
-	ERR_INVALID_RAID_TARGET, -- You cannot raid target enemy players
-	SPELL_FAILED_TARGET_NOT_PLAYER, -- Target is not a player
-	SPELL_FAILED_NOPATH, -- No path available
-	SPELL_FAILED_TARGET_AURASTATE, -- You can't do that yet
-	SPELL_FAILED_TARGET_AFFECTING_COMBAT, -- Target is in combat
-	ERR_ATTACK_DEAD, -- Can't attack while dead.
+local defaults = {
+	[ERR_OUT_OF_ENERGY] = true,
+	[ERR_SPELL_COOLDOWN] = true,
+	[ERR_OUT_OF_RANGE] = true,
+	[ERR_BADATTACKPOS] = true,
+	[ERR_ABILITY_COOLDOWN] = true,
 }
 
-local OrigHandler = UIErrorsFrame_OnEvent
-function UIErrorsFrame_OnEvent(self, event, msg, ...)
-	if(event == 'UI_ERROR_MESSAGE') then
-		for _, i in ipairs(blacklist) do
-			if(msg == i) then return end
+local function OnLoad(self, event, addon)
+	if(addon ~= 'pError') then return end
+
+	pErrorDB = pErrorDB or {}
+	for k,v in pairs(defaults) do
+		if(type(pErrorDB[k]) == 'nil') then
+			pErrorDB[k] = v
 		end
 	end
 
-	return OrigHandler(self, event, msg, ...)
+	self:UnregisterEvent(event)
+end
+
+local function OnEvent(self, event, ...)
+	if(event == 'UI_ERROR_MESSAGE') then
+		local str = ...
+		for k,v in pairs(pErrorDB) do
+			if(str == k and v) then return end
+		end
+	end
+
+	return orig(self, event, ...)
+end
+
+addon:RegisterEvent('ADDON_LOADED')
+addon:SetScript('OnEvent', OnLoad)
+UIErrorsFrame:SetScript('OnEvent', OnEvent)
+
+SLASH_PERROR1 = '/perror'
+SlashCmdList.PERROR = function(str)
+	if(str == 'reset') then
+		pErrorDB = {}
+		print('|cffff8080pError:|r Savedvariables is now reset')
+	elseif(str == 'list') then
+		print('|cffff8080pError:|r Listing database of events and their states:')
+		for k,v in pairs(pErrorDB) do
+			print(format('"%s"   %s', k, v and '|cff00ff00Enabled|r' or '|cffff0000Disabled|r'))
+		end
+	elseif(#str > 0) then
+		for k,v in pairs(pErrorDB) do
+			if(k == str) then
+				pErrorDB[k] = not v
+				print(format('|cffff8080pError:|r %s "%s"', k, v and 'Enabled' or 'Disabled'))
+				return
+			end
+		end
+
+		pErrorDB[str] = true
+		print(format('|cffff8080pError:|r Added "%s" to the database', str))
+	else
+		print('|cffff8080pError:|r Please provide an error string')
+	end
 end
