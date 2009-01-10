@@ -1,6 +1,4 @@
 local addon = CreateFrame('Frame')
-local orig = UIErrorsFrame_OnEvent
-
 local defaults = {
 	[ERR_OUT_OF_ENERGY] = true,
 	[ERR_SPELL_COOLDOWN] = true,
@@ -30,7 +28,7 @@ local function OnEvent(self, event, ...)
 		end
 	end
 
-	return orig(self, event, ...)
+	return UIErrorsFrame_OnEvent(self, event, ...)
 end
 
 addon:RegisterEvent('ADDON_LOADED')
