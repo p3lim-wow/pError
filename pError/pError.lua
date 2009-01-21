@@ -7,6 +7,17 @@ local defaults = {
 	[ERR_ABILITY_COOLDOWN] = true,
 }
 
+local function OnEvent(self, event, ...)
+	if(event == 'UI_ERROR_MESSAGE') then
+		local str = ...
+		for k,v in pairs(pErrorDB) do
+			if(string.find(string.lower(str), string.lower(k)) and v) then return end
+		end
+	end
+
+	return UIErrorsFrame_OnEvent(self, event, ...)
+end
+
 local function OnLoad(self, event, addon)
 	if(addon ~= 'pError') then return end
 
@@ -17,23 +28,13 @@ local function OnLoad(self, event, addon)
 		end
 	end
 
+	UIErrorsFrame:SetScript('OnEvent', OnEvent)
+
 	self:UnregisterEvent(event)
-end
-
-local function OnEvent(self, event, ...)
-	if(event == 'UI_ERROR_MESSAGE') then
-		local str = ...
-		for k,v in pairs(pErrorDB) do
-			if(str == k and v) then return end
-		end
-	end
-
-	return UIErrorsFrame_OnEvent(self, event, ...)
 end
 
 addon:RegisterEvent('ADDON_LOADED')
 addon:SetScript('OnEvent', OnLoad)
-UIErrorsFrame:SetScript('OnEvent', OnEvent)
 
 SLASH_PERROR1 = '/perror'
 SlashCmdList.PERROR = function(str)
@@ -47,7 +48,7 @@ SlashCmdList.PERROR = function(str)
 		end
 	elseif(#str > 0) then
 		for k,v in pairs(pErrorDB) do
-			if(k == str) then
+			if(string.find(string.lower(str), string.lower(k))) then
 				pErrorDB[k] = not v
 				print(format('|cffff8080pError:|r %s "%s"', v and '|cffff0000Disabled|r' or '|cff00ff00Enabled|r', k))
 				return
