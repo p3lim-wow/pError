@@ -1,72 +1,95 @@
-local function OnEvent(self, event, ...)
+local find = string.find
+local lower = string.lower
+local format = string.format
+
+local next = next
+local remove = table.remove
+local insert = table.insert
+
+local orig = UIErrorsFrame:GetScript('OnEvent')
+
+local function msg(...)
+	print(format('|cffff8080pError:|r %s', ...))
+end
+
+local function loadDefaults()
+	local revert = pErrorDB2 or {} -- remove at 3.1
+	pErrorDB = setmetatable(pErrorDB or revert, {__index = {all = false, blacklist = {}}})
+end
+
+local function slashCommand(str)
+	str = lower(str)
+
+	if(str == 'reset') then
+		wipe(pErrorDB)
+		loadDefaults()
+		msg('Savedvariables are now reset to default')
+	elseif(str == 'all') then
+		pErrorDB.all = not pErrorDB.all
+		msg(format('Filtering all events turned %s', pErrorDB.all and 'on' or 'off'))
+	elseif(str == 'list') then
+		if(pErrorDB.all) then
+			msg('Filtering all events!')
+		elseif(not pErrorDB.blacklist[1]) then
+			msg('Database is empty')
+		else
+			msg('Listing database of events:')
+
+			for k, v in next, pErrorDB.blacklist do
+				msg(format('|cff95ff95 \'%s\'|r', v))
+			end
+		end
+	elseif(#str > 0) then
+		if(pErrorDB.all) then
+			msg('Can\'t add to database, pError is filtering all events')
+		else
+			for k, v in next, pErrorDB.blacklist do
+				if(find(str, v)) then
+					remove(pErrorDB.blacklist, k)
+					return msg(format('Removed |cff95ff95\'%s\'|r from the database', v))
+				end
+			end
+
+			insert(pErrorDB.blacklist, str)
+			msg(format('Added |cff95ff95\'%s\'|r to the database', str))
+		end
+	else
+		msg('Please provide an error string')
+	end
+end
+
+local function onEvent(self, event, str, ...)
 	if(event == 'UI_ERROR_MESSAGE') then
-		local str = ...
-		if(pErrorDB2.all) then
+		if(pErrorDB.all) then
 			return
 		else
-			for k,v in ipairs(pErrorDB2.blacklist) do
-				if(string.find(string.lower(str), string.lower(v))) then return end
+			for k, v in next, pErrorDB.blacklist do
+				if(find(lower(str), v)) then return end
 			end
 		end
 	end
 
-	return UIErrorsFrame_OnEvent(self, event, ...)
+	return orig(self, event, str, ...)
 end
 
-local function OnLoad(self, event, addon)
+local function onLoad(self, event, addon)
 	if(addon ~= 'pError') then return end
-
-	pErrorDB2 = pErrorDB2 or {all = false, blacklist = {}}
-
-	UIErrorsFrame:SetScript('OnEvent', OnEvent)
 	self:UnregisterEvent(event)
-end
 
-local function pprint(...)
-	print(string.format('|cffff8080pError:|r %s', ...))
+	loadDefaults()
+
+	-- rollback function, remove soon!
+	for k, v in next, pErrorDB.blacklist do
+		remove(pErrorDB.blacklist, k)
+		insert(pErrorDB.blacklist, lower(v))
+	end
+
+	SLASH_pError1 = '/perror'
+	SlashCmdList.pError = slashCommand
+
+	UIErrorsFrame:SetScript('OnEvent', onEvent)
 end
 
 local addon = CreateFrame('Frame')
 addon:RegisterEvent('ADDON_LOADED')
-addon:SetScript('OnEvent', OnLoad)
-
-SLASH_PERROR1 = '/perror'
-SlashCmdList.PERROR = function(str)
-	if(str == 'reset') then
-		pErrorDB2 = {all = false, blacklist = {}}
-		pprint('Savedvariables is now reset')
-	elseif(str == 'all') then
-		pErrorDB2.all = not pErrorDB2.all
-		pprint(string.format('Filtering of all events turned %s', pErrorDB2.all and 'on' or 'off'))
-	elseif(str == 'list') then
-		if(pErrorDB2.all) then
-			pprint('Filtering all events!')
-		elseif(not pErrorDB2.blacklist[1]) then
-			pprint('Database is empty')
-		else
-			pprint('Listing database of events:')
-			for k,v in pairs(pErrorDB2.blacklist) do
-				pprint(format('  \'%s\'', v))
-			end
-		end
-	elseif(#str > 0) then
-		if(pErrorDB2.all) then
-			pprint('Can\'t add to database, pError is filtering all events')
-		else
-			local num = 0
-			for k,v in ipairs(pErrorDB2.blacklist) do
-				num = num + 1
-				if(string.find(string.lower(str), string.lower(v))) then
-					table.remove(pErrorDB2.blacklist, num)
-					pprint(format('\'%s\' removed', v))
-					return
-				end
-			end
-
-			table.insert(pErrorDB2.blacklist, str)
-			pprint(format('Added \'%s\' to the database', str))
-		end
-	else
-		pprint('Please provide an error string')
-	end
-end
+addon:SetScript('OnEvent', onLoad)
