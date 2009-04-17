@@ -1,10 +1,6 @@
+local next = next
 local find = string.find
 local lower = string.lower
-local format = string.format
-
-local next = next
-local remove = table.remove
-local insert = table.insert
 
 local orig = UIErrorsFrame:GetScript('OnEvent')
 
@@ -12,17 +8,11 @@ local function msg(...)
 	print(format('|cffff8080pError:|r %s', ...))
 end
 
-local function loadDefaults()
-	local revert = pErrorDB2 or {} -- remove at 3.1
-	pErrorDB = setmetatable(pErrorDB or revert, {__index = {all = false, blacklist = {}}})
-end
-
 local function slashCommand(str)
 	str = lower(str)
 
 	if(str == 'reset') then
-		wipe(pErrorDB)
-		loadDefaults()
+		pErrorDB = {all = false, blacklist = {}}
 		msg('Savedvariables are now reset to default')
 	elseif(str == 'all') then
 		pErrorDB.all = not pErrorDB.all
@@ -45,12 +35,12 @@ local function slashCommand(str)
 		else
 			for k, v in next, pErrorDB.blacklist do
 				if(find(str, v)) then
-					remove(pErrorDB.blacklist, k)
+					tremove(pErrorDB.blacklist, k)
 					return msg(format('Removed |cff95ff95\'%s\'|r from the database', v))
 				end
 			end
 
-			insert(pErrorDB.blacklist, str)
+			tinsert(pErrorDB.blacklist, str)
 			msg(format('Added |cff95ff95\'%s\'|r to the database', str))
 		end
 	else
@@ -76,13 +66,7 @@ local function onLoad(self, event, addon)
 	if(addon ~= 'pError') then return end
 	self:UnregisterEvent(event)
 
-	loadDefaults()
-
-	-- rollback function, remove soon!
-	for k, v in next, pErrorDB.blacklist do
-		remove(pErrorDB.blacklist, k)
-		insert(pErrorDB.blacklist, lower(v))
-	end
+	pErrorDB = pErrorDB or {all = false, blacklist = {}}
 
 	SLASH_pError1 = '/perror'
 	SlashCmdList.pError = slashCommand
