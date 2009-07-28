@@ -3,6 +3,6 @@
 ## Version: 30100.wowi:revision
 ## Title: |cffff6000p|rError
 ## Notes: Hide those pesky errors!
-## SavedVariables: pErrorDB
+## SavedVariables: pErrorDB, pErrorUpdated
 
 pError.lua
