@@ -60,7 +60,7 @@ pError:SetScript('OnEvent', function(self, event, name)
 
 		if(not pErrorUpdated) then
 			print('|cffff8080pError:|r Converted database into new format, thanks for updating!')
-			pErrorDB = pErrorDB.blacklist
+			pErrorDB = pErrorDB and pErrorDB.blacklist
 			pErrorUpdated = true
 		end
 
