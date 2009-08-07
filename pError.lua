@@ -58,12 +58,6 @@ addon:SetScript('OnEvent', function(self, event, name)
 	if(name == 'pError') then
 		self:SetScript('OnEvent', nil)
 
-		if(not pErrorUpdated) then
-			print('|cffff8080pError:|r Converted database into new format, thanks for updating!')
-			pErrorDB = pErrorDB and pErrorDB.blacklist
-			pErrorUpdated = true
-		end
-
 		pErrorDB = pErrorDB or {}
 
 		SLASH_pError1 = '/perror'
