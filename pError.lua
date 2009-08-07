@@ -12,7 +12,7 @@
 local next = next
 local find, lower = string.find, string.lower
 
-local pError = CreateFrame('Frame')
+local addon = CreateFrame('Frame')
 local orig = UIErrorsFrame:GetScript('OnEvent')
 
 local function slashCommand(str)
@@ -53,8 +53,8 @@ local function onEvent(self, event, str, ...)
 	return orig(self, event, str, ...)
 end
 
-pError:RegisterEvent('ADDON_LOADED')
-pError:SetScript('OnEvent', function(self, event, name)
+addon:RegisterEvent('ADDON_LOADED')
+addon:SetScript('OnEvent', function(self, event, name)
 	if(name == 'pError') then
 		self:SetScript('OnEvent', nil)
 
