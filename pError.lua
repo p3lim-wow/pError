@@ -41,7 +41,7 @@ local function slashCommand(str)
 	end
 end
 
-local function onEvent(self, event, str, ...)
+local function errorEvent(self, event, str, ...)
 	if(event == 'UI_ERROR_MESSAGE' and addon.db[1]) then
 		for k, v in next, addon.db do
 			if(find(lower(str), v)) then
@@ -63,5 +63,5 @@ addon:SetScript('OnEvent', function(self, event, name)
 	SLASH_pError1 = '/perror'
 	SlashCmdList[name] = function(str) slashCommand(lower(str)) end
 
-	UIErrorsFrame:SetScript('OnEvent', onEvent)
+	UIErrorsFrame:SetScript('OnEvent', errorEvent)
 end)
