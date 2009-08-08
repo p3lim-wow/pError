@@ -1,6 +1,6 @@
 ## Interface: 30200
 ## Author: p3lim
-## Version: Alpha
+## Version: 30200.1-Beta
 ## Title: |cffff6000p|rError
 ## Notes: Hide those pesky errors!
 ## SavedVariables: pErrorDB, pErrorUpdated
