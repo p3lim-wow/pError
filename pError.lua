@@ -17,33 +17,33 @@ local orig = UIErrorsFrame:GetScript('OnEvent')
 
 local function slashCommand(str)
 	if(str == 'reset') then
-		pMinimapDB = {}
+		pErrorDB = {}
 		print('|cffff8080pError:|r Database is now reset to default')
 	elseif(str == 'list') then
-		if(pMinimapDB[1]) then
+		if(pErrorDB[1]) then
 			print('|cffff8080pError:|r Listing database:')
-			for k, v in next, pMinimapDB do
+			for k, v in next, pErrorDB do
 				print('            |cff95ff95', v, '|r')
 			end
 		else
 			print('|cffff8080pError:|r Database is empty')
 		end
 	elseif(#str > 0) then
-		for k, v in next, pMinimapDB do
+		for k, v in next, pErrorDB do
 			if(find(str, v)) then
-				tremove(pMinimapDB, k)
+				tremove(pErrorDB, k)
 				return print('|cffff8080pError:|r Removed|cff95ff95', v, '|rfrom database')
 			end
 		end
 
-		tinsert(pMinimapDB, str)
+		tinsert(pErrorDB, str)
 		print('|cffff8080pError:|r Added|cff95ff95', str, '|rto database')
 	end
 end
 
 local function errorEvent(self, event, str, ...)
-	if(event == 'UI_ERROR_MESSAGE' and pMinimapDB[1]) then
-		for k, v in next, pMinimapDB do
+	if(event == 'UI_ERROR_MESSAGE' and pErrorDB[1]) then
+		for k, v in next, pErrorDB do
 			if(find(lower(str), v)) then
 				return
 			end
