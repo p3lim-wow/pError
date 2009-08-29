@@ -3,6 +3,6 @@
 ## Version: Alpha
 ## Title: |cffff6000p|rError
 ## Notes: Hide those pesky errors!
-## SavedVariables: pErrorDB, pErrorUpdated
+## SavedVariables: pErrorDB
 
 pError.lua

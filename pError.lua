@@ -17,33 +17,33 @@ local orig = UIErrorsFrame:GetScript('OnEvent')
 
 local function slashCommand(str)
 	if(str == 'reset') then
-		addon.db = {}
+		pMinimapDB = {}
 		print('|cffff8080pError:|r Database is now reset to default')
 	elseif(str == 'list') then
-		if(addon.db[1]) then
+		if(pMinimapDB[1]) then
 			print('|cffff8080pError:|r Listing database:')
-			for k, v in next, addon.db do
+			for k, v in next, pMinimapDB do
 				print('            |cff95ff95', v, '|r')
 			end
 		else
 			print('|cffff8080pError:|r Database is empty')
 		end
 	elseif(#str > 0) then
-		for k, v in next, addon.db do
+		for k, v in next, pMinimapDB do
 			if(find(str, v)) then
-				tremove(addon.db, k)
+				tremove(pMinimapDB, k)
 				return print('|cffff8080pError:|r Removed|cff95ff95', v, '|rfrom database')
 			end
 		end
 
-		tinsert(addon.db, str)
+		tinsert(pMinimapDB, str)
 		print('|cffff8080pError:|r Added|cff95ff95', str, '|rto database')
 	end
 end
 
 local function errorEvent(self, event, str, ...)
-	if(event == 'UI_ERROR_MESSAGE' and addon.db[1]) then
-		for k, v in next, addon.db do
+	if(event == 'UI_ERROR_MESSAGE' and pMinimapDB[1]) then
+		for k, v in next, pMinimapDB do
 			if(find(lower(str), v)) then
 				return
 			end
@@ -58,7 +58,7 @@ addon:SetScript('OnEvent', function(self, event, name)
 	if(name ~= self:GetName()) then return end
 
 	self:UnregisterEvent(event)
-	self.db = pErrorDB or {}
+	pErrorDB = pErrorDB or {}
 
 	SLASH_pError1 = '/perror'
 	SlashCmdList[name] = function(str) slashCommand(lower(str)) end
