@@ -9,7 +9,6 @@
 
 --]]
 
-local next = next
 local find, lower = string.find, string.lower
 
 local addon = CreateFrame('Frame', 'pError')
@@ -22,28 +21,28 @@ local function slashCommand(str)
 	elseif(str == 'list') then
 		if(pErrorDB[1]) then
 			print('|cffff8080pError:|r Listing database:')
-			for k, v in next, pErrorDB do
+			for k, v in pairs(pErrorDB) do
 				print('            |cff95ff95', v, '|r')
 			end
 		else
 			print('|cffff8080pError:|r Database is empty')
 		end
 	elseif(#str > 0) then
-		for k, v in next, pErrorDB do
+		for k, v in pairs(pErrorDB) do
 			if(find(str, v)) then
-				tremove(pErrorDB, k)
+				table.remove(pErrorDB, k)
 				return print('|cffff8080pError:|r Removed|cff95ff95', v, '|rfrom database')
 			end
 		end
 
-		tinsert(pErrorDB, str)
+		table.insert(pErrorDB, str)
 		print('|cffff8080pError:|r Added|cff95ff95', str, '|rto database')
 	end
 end
 
 local function errorEvent(self, event, str, ...)
 	if(event == 'UI_ERROR_MESSAGE' and pErrorDB[1]) then
-		for k, v in next, pErrorDB do
+		for k, v in pairs(pErrorDB) do
 			if(find(lower(str), v)) then
 				return
 			end
