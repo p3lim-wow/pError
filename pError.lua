@@ -1,6 +1,6 @@
 --[[
 
- Copyright (c) 2009, Adrian L Lange
+ Copyright (c) 2009-2010, Adrian L Lange
  All rights reserved.
 
  You're allowed to use this addon, free of monetary charge,
@@ -9,9 +9,11 @@
 
 --]]
 
+local addonName = ...
+
 local find, lower = string.find, string.lower
 
-local addon = CreateFrame('Frame', 'pError')
+local addon = CreateFrame('Frame', addonName)
 local orig = UIErrorsFrame:GetScript('OnEvent')
 
 local function slashCommand(str)
@@ -54,13 +56,13 @@ end
 
 addon:RegisterEvent('ADDON_LOADED')
 addon:SetScript('OnEvent', function(self, event, name)
-	if(name ~= self:GetName()) then return end
+	if(name ~= addonName) then return end
 
 	self:UnregisterEvent(event)
 	pErrorDB = pErrorDB or {}
 
 	SLASH_pError1 = '/perror'
-	SlashCmdList[name] = function(str) slashCommand(lower(str)) end
+	SlashCmdList[addonName] = function(str) slashCommand(lower(str)) end
 
 	UIErrorsFrame:SetScript('OnEvent', errorEvent)
 end)
