@@ -13,6 +13,8 @@ local addonName = ...
 
 local find, lower = string.find, string.lower
 
+local LISTENING = false
+
 local addon = CreateFrame('Frame', addonName)
 local orig = UIErrorsFrame:GetScript('OnEvent')
 
@@ -29,6 +31,9 @@ local function slashCommand(str)
 		else
 			print('|cffff8080pError:|r Database is empty')
 		end
+	elseif(str == 'listen') then
+		LISTENING = not LISTENING
+		print('|cffff8080pError:|r Listening to any errors now ', LISTENING and 'enabled' or 'disabled')
 	elseif(#str > 0) then
 		for k, v in pairs(pErrorDB) do
 			if(find(str, v)) then
@@ -48,6 +53,11 @@ local function errorEvent(self, event, str, ...)
 			if(find(lower(str), v)) then
 				return
 			end
+		end
+
+		if(LISTENING) then
+			table.insert(pErrorDB, str)
+			print('|cffff8080pError:|r Added|cff95ff95', str, '|rto database')
 		end
 	end
 
